@@ -137,166 +137,130 @@ export default function Inventario() {
 
   const totalItensCarrinho = carrinho.reduce((acc, item) => acc + item.quantidadeSelecionada, 0);
 
+  // ... (mantenha os imports e funções de lógica iguais)
+
   return (
-    <div className="p-8 max-w-6xl mx-auto relative pb-24">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-800">Inventário</h1>
-        <p className="text-slate-500 mt-1">Gerencie os equipamentos disponíveis no setor de TI.</p>
+    <div className="p-10 max-w-7xl mx-auto relative pb-32">
+      <header className="mb-12">
+        <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Gestão de Inventário</h1>
+        <p className="text-slate-500 text-lg mt-2">Controle, organize e distribua ativos com facilidade.</p>
       </header>
 
-      {/* Formulário de Cadastro */}
-      <section className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-10">
-        <h2 className="text-lg font-semibold mb-4 text-slate-700">Novo Equipamento</h2>
-        <form onSubmit={handleCadastrar} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+      {/* Formulário Elegante */}
+      <section className="bg-white p-8 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 mb-12 relative overflow-hidden group">
+        <div className="absolute top-0 left-0 w-2 h-full bg-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+        <h2 className="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">
+          ✨ Cadastrar Novo Ativo
+        </h2>
+        <form onSubmit={handleCadastrar} className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-slate-600 mb-1">Nome do Item</label>
-            <input type="text" value={novoNome} onChange={e => setNovoNome(e.target.value)} className="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="Ex: Mouse Logitech G203" />
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Nome do Equipamento</label>
+            <input type="text" value={novoNome} onChange={e => setNovoNome(e.target.value)} className="w-full bg-slate-50 border-none p-4 rounded-2xl focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-slate-300 font-medium" placeholder="Ex: Mouse Logitech M90" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">Categoria</label>
-            <select value={novaCategoria} onChange={e => setNovaCategoria(e.target.value)} className="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all">
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Categoria</label>
+            <select value={novaCategoria} onChange={e => setNovaCategoria(e.target.value)} className="w-full bg-slate-50 border-none p-4 rounded-2xl focus:ring-2 focus:ring-blue-500/20 outline-none font-medium cursor-pointer">
               <option value="">Selecione...</option>
-              <option value="Periférico">Periférico</option>
-              <option value="Computador">Computador</option>
-              <option value="Cabo/Adaptador">Cabo/Adaptador</option>
+              <option value="Periférico">🖱️ Periférico</option>
+              <option value="Computador">💻 Computador</option>
+              <option value="Cabo/Adaptador">🔌 Cabo/Adaptador</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">Quantidade</label>
-            <div className="flex gap-2">
-              <input type="number" min="0" value={novaQtd} onChange={e => setNovaQtd(e.target.value)} className="w-full border border-slate-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
-              <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 rounded-lg transition-colors">
-                +
+            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Qtd Inicial</label>
+            <div className="flex gap-3">
+              <input type="number" min="0" value={novaQtd} onChange={e => setNovaQtd(e.target.value)} className="w-full bg-slate-50 border-none p-4 rounded-2xl focus:ring-2 focus:ring-blue-500/20 outline-none font-medium" />
+              <button type="submit" className="bg-slate-900 hover:bg-blue-600 text-white p-4 rounded-2xl transition-all duration-300 shadow-lg shadow-slate-200 hover:shadow-blue-200">
+                🚀
               </button>
             </div>
           </div>
         </form>
       </section>
 
-      {/* Barra de Busca e Título */}
-      <section className="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h2 className="text-lg font-semibold text-slate-700">Estoque Atual</h2>
-        <div className="w-full md:w-72">
+      {/* Grid de Ativos */}
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="text-2xl font-bold text-slate-800">Estoque Atual</h2>
+        <div className="relative group">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">🔍</span>
           <input 
             type="text" 
-            placeholder="Pesquisar item ou categoria..." 
+            placeholder="Pesquisar..." 
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className="w-full border border-slate-300 p-2 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+            className="pl-11 pr-6 py-3 bg-white border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none w-64 transition-all shadow-sm"
           />
         </div>
-      </section>
+      </div>
 
-      {/* Grid de Equipamentos */}
-      <section>
-        {itensFiltrados.length === 0 ? (
-          <div className="text-center py-12 bg-slate-100 rounded-xl border border-dashed border-slate-300">
-            <p className="text-slate-500">Nenhum item encontrado.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {itensFiltrados.map(item => {
-              const noCarrinho = carrinho.find(c => c.id === item.id);
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {itensFiltrados.map(item => {
+          const noCarrinho = carrinho.find(c => c.id === item.id);
+          return (
+            <div key={item.id} className={`bg-white p-8 rounded-[2.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border transition-all duration-500 relative group ${noCarrinho ? 'border-blue-200 ring-4 ring-blue-500/5' : 'border-transparent hover:border-slate-200 hover:shadow-xl hover:-translate-y-1'}`}>
               
-              return (
-                <div key={item.id} className={`bg-white p-5 rounded-xl shadow-sm border transition-shadow relative group ${noCarrinho ? 'border-blue-400 ring-1 ring-blue-100' : 'border-slate-200 hover:shadow-md'}`}>
-                  
-                  <button onClick={() => handleExcluir(item.id, item.nome)} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors" title="Excluir Cadastro">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+              <button onClick={() => handleExcluir(item.id, item.nome)} className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center rounded-full text-slate-300 hover:bg-rose-50 hover:text-rose-500 transition-all opacity-0 group-hover:opacity-100">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+              </button>
+
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl mb-6 ${item.quantidade === 0 ? 'bg-rose-100' : 'bg-slate-100'}`}>
+                {item.categoria === 'Computador' ? '💻' : item.categoria === 'Periférico' ? '🖱️' : '🔌'}
+              </div>
+              
+              <h3 className="text-xl font-bold text-slate-800 mb-1">{item.nome}</h3>
+              <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">{item.categoria}</p>
+              
+              <div className="flex items-end gap-2 mb-8">
+                <span className={`text-5xl font-black leading-none ${item.quantidade === 0 ? 'text-rose-500' : 'text-slate-800'}`}>
+                  {item.quantidade}
+                </span>
+                <span className="text-slate-400 font-bold pb-1 underline decoration-slate-200 decoration-4 underline-offset-4">em estoque</span>
+              </div>
+              
+              <div className="flex gap-3">
+                <button onClick={() => handleEntrada(item.id, item.nome)} className="p-4 bg-emerald-50 text-emerald-600 rounded-2xl font-bold hover:bg-emerald-100 transition-colors flex-shrink-0">
+                  +
+                </button>
+                
+                {!noCarrinho ? (
+                  <button 
+                    onClick={() => adicionarAoCarrinho(item)}
+                    disabled={item.quantidade === 0}
+                    className="flex-1 bg-slate-900 text-white rounded-2xl font-bold hover:bg-blue-600 disabled:opacity-30 transition-all shadow-lg shadow-slate-200 hover:shadow-blue-200"
+                  >
+                    Adicionar Saída
                   </button>
-
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-xs font-semibold bg-slate-100 text-slate-500 px-2 py-1 rounded text-uppercase">{item.categoria}</span>
+                ) : (
+                  <div className="flex-1 flex items-center justify-between bg-blue-600 text-white rounded-2xl overflow-hidden shadow-lg shadow-blue-200">
+                    <button onClick={() => alterarQuantidadeCarrinho(item.id, -1, item.quantidade)} className="w-10 h-full hover:bg-white/10 transition-colors font-bold text-xl">-</button>
+                    <span className="font-bold">{noCarrinho.quantidadeSelecionada}</span>
+                    <button onClick={() => alterarQuantidadeCarrinho(item.id, 1, item.quantidade)} className="w-10 h-full hover:bg-white/10 transition-colors font-bold text-xl">+</button>
+                    <button onClick={() => removerDoCarrinho(item.id)} className="w-10 h-full bg-blue-700 hover:bg-rose-500 transition-colors flex items-center justify-center">×</button>
                   </div>
-                  
-                  <h3 className="text-lg font-bold text-slate-800 line-clamp-1 pr-6" title={item.nome}>{item.nome}</h3>
-                  
-                  <div className="flex items-center gap-2 mt-3 mb-5">
-                    <span className="text-3xl font-black text-slate-700">{item.quantidade}</span>
-                    <span className="text-sm text-slate-400">em estoque</span>
-                  </div>
-                  
-                  {/* --- A MÁGICA DOS BOTÕES ACONTECE AQUI --- */}
-                  <div className="flex gap-2 h-10">
-                    <button onClick={() => handleEntrada(item.id, item.nome)} className="flex-1 bg-emerald-50 text-emerald-700 border border-emerald-200 font-medium rounded-lg hover:bg-emerald-100 transition-colors text-sm">
-                      + Entrada
-                    </button>
-                    
-                    {!noCarrinho ? (
-                      // Botão Padrão (+ Carrinho)
-                      <button 
-                        onClick={() => adicionarAoCarrinho(item)}
-                        disabled={item.quantidade === 0}
-                        className="flex-1 bg-slate-50 text-slate-700 border border-slate-200 font-medium rounded-lg hover:bg-slate-100 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        + Carrinho
-                      </button>
-                    ) : (
-                      // Controles Rápidos do Carrinho (Aparecem quando o item está selecionado)
-                      <div className="flex-1 flex items-center justify-between bg-blue-50 border border-blue-300 rounded-lg overflow-hidden">
-                        <button 
-                          onClick={() => alterarQuantidadeCarrinho(item.id, -1, item.quantidade)} 
-                          className="w-8 h-full flex items-center justify-center text-blue-700 hover:bg-blue-200 transition-colors font-bold text-lg"
-                        >
-                          -
-                        </button>
-                        
-                        <span className="text-blue-800 font-bold text-sm">
-                          {noCarrinho.quantidadeSelecionada}
-                        </span>
-                        
-                        <button 
-                          onClick={() => alterarQuantidadeCarrinho(item.id, 1, item.quantidade)} 
-                          className="w-8 h-full flex items-center justify-center text-blue-700 hover:bg-blue-200 transition-colors font-bold text-lg"
-                        >
-                          +
-                        </button>
-                        
-                        <button 
-                          onClick={() => removerDoCarrinho(item.id)} 
-                          className="w-8 h-full flex items-center justify-center text-rose-500 hover:bg-rose-100 hover:text-rose-600 transition-colors border-l border-blue-200"
-                          title="Remover do Carrinho"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                </div>
-              );
-            })}
-          </div>
-        )}
+                )}
+              </div>
+            </div>
+          );
+        })}
       </section>
 
+      {/* Botão Flutuante Pulsante */}
       {carrinho.length > 0 && (
-        <div className="fixed bottom-8 right-8 animate-in slide-in-from-bottom-5 z-40">
+        <div className="fixed bottom-12 right-12 z-40">
           <button 
             onClick={abrirModal}
-            className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-full shadow-2xl shadow-blue-600/30 transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-4 bg-slate-900 text-white px-8 py-5 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] hover:bg-blue-600 hover:scale-105 active:scale-95 transition-all group"
           >
-            <span className="text-xl">🛒</span>
-            <span className="font-bold">Finalizar Lote</span>
-            <span className="bg-white text-blue-700 font-black text-xs px-2.5 py-1 rounded-full ml-1">
-              {totalItensCarrinho}
-            </span>
+            <span className="text-2xl group-hover:rotate-12 transition-transform">🛒</span>
+            <div className="text-left leading-tight">
+              <p className="font-bold">Finalizar Lote</p>
+              <p className="text-[10px] uppercase font-black text-blue-300 tracking-tighter">{totalItensCarrinho} Itens selecionados</p>
+            </div>
           </button>
         </div>
       )}
 
-      <Modal 
-        isOpen={modalAberto} 
-        onClose={() => setModalAberto(false)} 
-        onConfirm={confirmarSaida} 
-        carrinho={carrinho}
-        setCarrinho={setCarrinho}
-        nomeColaborador={nomeColaborador}
-        setNomeColaborador={setNomeColaborador}
-      />
-
+      <Modal isOpen={modalAberto} onClose={() => setModalAberto(false)} onConfirm={confirmarSaida} carrinho={carrinho} setCarrinho={setCarrinho} nomeColaborador={nomeColaborador} setNomeColaborador={setNomeColaborador} />
     </div>
   );
 }

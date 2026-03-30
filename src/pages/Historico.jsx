@@ -4,33 +4,32 @@ import { getLogs } from '../utils/storage';
 export default function Historico() {
   const [logs, setLogs] = useState([]);
   const [busca, setBusca] = useState('');
-  
-  // Estado: Guarda qual é o filtro de ação atual
   const [filtroAcao, setFiltroAcao] = useState('Todas');
 
-  // Carrega os logs ao abrir a página
   useEffect(() => {
     setLogs(getLogs());
   }, []);
 
-  // Filtra os logs pela barra de pesquisa E pelo botão clicado
   const logsFiltrados = logs.filter(log => {
-    // 1. Verifica o filtro de texto
     const termo = busca.toLowerCase();
-    const matchBusca = 
-      log.itemNome.toLowerCase().includes(termo) ||
-      log.usuario.toLowerCase().includes(termo) ||
-      log.acao.toLowerCase().includes(termo) ||
-      log.data.toLowerCase().includes(termo);
     
-    // 2. Verifica o filtro dos botões (Pills)
+    // Validação de segurança extra para evitar erros se algum campo estiver vazio no localStorage
+    const nome = log.itemNome ? log.itemNome.toLowerCase() : '';
+    const usuario = log.usuario ? log.usuario.toLowerCase() : '';
+    const acao = log.acao ? log.acao.toLowerCase() : '';
+    const data = log.data ? log.data.toLowerCase() : '';
+
+    const matchBusca = 
+      nome.includes(termo) ||
+      usuario.includes(termo) ||
+      acao.includes(termo) ||
+      data.includes(termo);
+    
     const matchAcao = filtroAcao === 'Todas' || log.acao === filtroAcao;
 
-    // Só mostra na tela se passar pelos dois filtros
     return matchBusca && matchAcao;
   });
 
-  // Função para definir a cor da "etiqueta" dependendo da ação
   const getBadgeColor = (acao) => {
     switch (acao) {
       case 'Saída': return 'bg-rose-100 text-rose-700 border-rose-200';
@@ -51,7 +50,6 @@ export default function Historico() {
           <p className="text-slate-500 mt-1">Registro completo de auditoria de entradas e saídas.</p>
         </div>
         
-        {/* Campo de Busca do Histórico */}
         <div className="w-full md:w-80">
           <input 
             type="text" 
@@ -63,7 +61,6 @@ export default function Historico() {
         </div>
       </header>
 
-      {/* BARRA DE FILTROS RÁPIDOS */}
       <div className="mb-6 flex flex-wrap gap-2">
         {opcoesFiltro.map(opcao => (
           <button
@@ -101,12 +98,13 @@ export default function Historico() {
                 {logsFiltrados.length === 0 ? (
                   <tr>
                     <td colSpan="4" className="p-8 text-center text-slate-500 italic">
-                      Nenhum registro encontrado para os filtros atuais.
+                      Nenhum registro encontrado para a busca "{busca}".
                     </td>
                   </tr>
                 ) : (
-                  logsFiltrados.map((log) => (
-                    <tr key={log.id} className="hover:bg-slate-50 transition-colors">
+                  // A MÁGICA ESTÁ AQUI: index foi adicionado para gerar uma chave única mesmo nos erros passados
+                  logsFiltrados.map((log, index) => (
+                    <tr key={`${log.id}-${index}`} className="hover:bg-slate-50 transition-colors">
                       <td className="p-4 whitespace-nowrap text-sm text-slate-500">
                         {log.data}
                       </td>
