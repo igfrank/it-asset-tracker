@@ -1,33 +1,81 @@
-// src/utils/storage.js
+const API_URL = 'http://localhost:8000';
 
-const ASSETS_KEY = 'ti_assets';
-const LOGS_KEY = 'ti_logs';
-
-export const getAssets = () => {
-  const data = localStorage.getItem(ASSETS_KEY);
-  return data ? JSON.parse(data) : [];
+export const getAssets = async () => {
+  const response = await fetch(`${API_URL}/equipamentos`);
+  return await response.json();
 };
 
-export const saveAssets = (assets) => {
-  localStorage.setItem(ASSETS_KEY, JSON.stringify(assets));
+export const getLogs = async () => {
+  const response = await fetch(`${API_URL}/logs`);
+  return await response.json();
 };
 
-export const getLogs = () => {
-  const data = localStorage.getItem(LOGS_KEY);
-  return data ? JSON.parse(data) : [];
+// Esta função resolve o erro de "Requested module does not provide an export named 'addLog'"
+export const addLog = async (acao, itemNome, usuario, responsavel) => {
+  await fetch(`${API_URL}/logs`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      acao, 
+      itemNome, 
+      usuario, 
+      responsavel // Agora enviamos o nome de quem está logado para o Python
+    })
+  });
 };
 
-// --- FUNÇÃO CORRIGIDA COM ID ÚNICO ---
-export const addLog = (acao, itemNome, usuario) => {
-  const logs = getLogs();
-  const novoLog = {
-    id: crypto.randomUUID(), // <--- MÁGICA AQUI: Gera um código 100% único (Ex: "550e8400-e29b-41d4-a716-446655440000")
-    data: new Date().toLocaleString('pt-BR'),
-    acao, 
-    itemNome,
-    usuario: usuario || 'Sistema'
-  };
+// Como o banco salva individualmente, esta função agora é apenas um "placeholder" 
+// para não quebrar o código antigo do Inventário
+export const saveAssets = () => { return; };
+
+// Adicione ao final do seu src/utils/storage.js
+
+export const loginUser = async (username, senha) => {
+  const response = await fetch(`http://localhost:8000/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, senha })
+  });
   
-  logs.unshift(novoLog); 
-  localStorage.setItem(LOGS_KEY, JSON.stringify(logs));
+  if (!response.ok) throw new Error('Falha no login');
+  
+  const user = await response.json();
+  // Salva os dados do usuário para sabermos quem está usando o sistema
+  localStorage.setItem('ti_user', JSON.stringify(user));
+  return user;
+};
+
+export const getLoggedUser = () => {
+  const user = localStorage.getItem('ti_user');
+  return user ? JSON.parse(user) : null;
+};
+
+export const logout = () => {
+  localStorage.removeItem('ti_user');
+  window.location.href = '/';
+};
+
+export const getUsers = async () => {
+  const response = await fetch(`${API_URL}/usuarios`);
+  return await response.json();
+};
+
+export const createUser = async (user) => {
+  await fetch(`${API_URL}/usuarios`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(user)
+  });
+};
+
+export const deleteUser = async (id) => {
+  await fetch(`${API_URL}/usuarios/${id}`, { method: 'DELETE' });
+};
+
+export const updateUser = async (id, user) => {
+  await fetch(`${API_URL}/usuarios/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(user)
+  });
 };

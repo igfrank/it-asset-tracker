@@ -1,15 +1,21 @@
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Inventario from './pages/Inventario';
 import Historico from './pages/Historico';
+import Usuarios from './pages/Usuarios'; // Importação da nova página de gestão
+import Login from './pages/Login'; 
+import { getLoggedUser, logout } from './utils/storage';
 
 function Navbar() {
   const location = useLocation();
+  const user = getLoggedUser(); // Pega os dados de quem está logado
   
   const menuItems = [
-    { path: '/', label: 'Visão Geral', icon: 'grid_view' }, // Usando representação de ícones
-    { path: '/inventario', label: 'Inventário', icon: 'inventory_2' },
-    { path: '/historico', label: 'Histórico', icon: 'history' }
+    { path: '/', label: 'Visão Geral', icon: '📊' },
+    { path: '/inventario', label: 'Inventário', icon: '📦' },
+    { path: '/historico', label: 'Histórico', icon: '🕒' },
+    { path: '/usuarios', label: 'Usuários', icon: '👤' } // Novo item adicionado ao menu
   ];
 
   return (
@@ -35,7 +41,7 @@ function Navbar() {
               }`}
             >
               <span className={`text-xl transition-transform duration-300 ${active ? 'scale-110' : 'group-hover:scale-110'}`}>
-                {item.path === '/' ? '📊' : item.path === '/inventario' ? '📦' : '🕒'}
+                {item.icon}
               </span>
               <span className="font-semibold">{item.label}</span>
               {active && <div className="ml-auto w-1.5 h-1.5 bg-blue-600 rounded-full"></div>}
@@ -44,11 +50,17 @@ function Navbar() {
         })}
       </div>
 
-      <div className="mt-auto p-4 bg-slate-50 rounded-2xl border border-slate-100">
-        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Status do Sistema</p>
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-          <p className="text-sm font-semibold text-slate-600">Online Local</p>
+      <div className="mt-auto flex flex-col gap-4">
+        {/* Mostra quem está logado e botão de Sair */}
+        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Usuário Logado</p>
+          <p className="text-sm font-semibold text-slate-600 mb-2">{user?.nome}</p>
+          <button 
+            onClick={logout}
+            className="text-xs text-rose-500 font-bold hover:text-rose-700 flex items-center gap-1"
+          >
+            🚪 Encerrar Sessão
+          </button>
         </div>
       </div>
     </nav>
@@ -56,6 +68,14 @@ function Navbar() {
 }
 
 export default function App() {
+  // Estado que controla se o usuário está logado
+  const [user, setUser] = useState(getLoggedUser());
+
+  // Se NÃO houver usuário, renderiza apenas o componente de Login
+  if (!user) {
+    return <Login onLoginSuccess={() => setUser(getLoggedUser())} />;
+  }
+
   return (
     <BrowserRouter>
       <div className="flex min-h-screen">
@@ -65,6 +85,7 @@ export default function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/inventario" element={<Inventario />} />
             <Route path="/historico" element={<Historico />} />
+            <Route path="/usuarios" element={<Usuarios />} /> {/* Nova rota registrada */}
           </Routes>
         </main>
       </div>
