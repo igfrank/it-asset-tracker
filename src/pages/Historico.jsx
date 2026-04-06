@@ -5,7 +5,6 @@ export default function Historico() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState('');
-  // 1. Novo estado para o filtro de tipo de ação
   const [filtroAcao, setFiltroAcao] = useState('Todos');
 
   useEffect(() => {
@@ -21,39 +20,39 @@ export default function Historico() {
     carregarHistorico();
   }, []);
 
-  // 2. Lógica de filtragem combinada (Texto + Tipo de Ação)
+  // Lógica de filtragem combinada (Texto + Tipo de Ação + Estado)
   const logsFiltrados = logs.filter(log => {
     const termo = busca.toLowerCase();
     
-    // Verifica se bate com o texto pesquisado
+    // Verifica se bate com o texto pesquisado em qualquer campo snapshot
     const bateTexto = (
       log.item_nome_snapshot?.toLowerCase().includes(termo) ||
+      log.item_estado_snapshot?.toLowerCase().includes(termo) || // Busca por 'novo' ou 'usado'
       log.usuario_nome_snapshot?.toLowerCase().includes(termo) ||
       log.responsavel_ti_snapshot?.toLowerCase().includes(termo)
     );
 
-    // Verifica se bate com o tipo de ação selecionado no dropdown
     const bateTipo = filtroAcao === 'Todos' || log.tipo_acao === filtroAcao;
 
     return bateTexto && bateTipo;
   });
 
-  if (loading) return <div className="p-10 text-center font-bold">Carregando...</div>;
+  if (loading) return <div className="p-10 text-center font-bold">Carregando histórico de auditoria...</div>;
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <header className="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <h1 className="text-3xl font-bold text-slate-800">Histórico de Auditoria</h1>
-          <p className="text-slate-500">Rastreabilidade total de quem entregou e quem recebeu.</p>
+          <p className="text-slate-500">Rastreabilidade total de quem entregou, quem recebeu e o estado do ativo.</p>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          {/* 3. Dropdown de Filtro por Ação */}
+          {/* Dropdown de Filtro por Ação */}
           <select 
             value={filtroAcao}
             onChange={(e) => setFiltroAcao(e.target.value)}
-            className="border p-2.5 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium text-slate-600"
+            className="border p-2.5 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium text-slate-600 shadow-sm"
           >
             <option value="Todos">Todas as Ações</option>
             <option value="Cadastro">✨ Cadastros</option>
@@ -64,8 +63,8 @@ export default function Historico() {
 
           <input 
             type="text" 
-            placeholder="Pesquisar..." 
-            className="border p-2.5 rounded-lg w-full sm:w-64 outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Pesquisar equipamento ou colaborador..." 
+            className="border p-2.5 rounded-lg w-full sm:w-80 outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
             value={busca} 
             onChange={e => setBusca(e.target.value)}
           />
@@ -74,7 +73,7 @@ export default function Historico() {
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
         <table className="w-full text-left border-collapse">
-          <thead className="bg-slate-50 text-slate-600 text-xs uppercase font-bold">
+          <thead className="bg-slate-50 text-slate-600 text-xs uppercase font-bold border-b border-slate-200">
             <tr>
               <th className="p-4">Data/Hora</th>
               <th className="p-4">Ação</th>
@@ -100,9 +99,25 @@ export default function Historico() {
                       {log.tipo_acao}
                     </span>
                   </td>
-                  <td className="p-4 font-semibold text-slate-800">{log.item_nome_snapshot}</td>
-                  <td className="p-4 text-sm font-bold text-blue-700">{log.responsavel_ti_snapshot}</td>
-                  <td className="p-4 text-sm italic text-slate-600">{log.usuario_nome_snapshot}</td>
+                  <td className="p-4">
+                    <div className="flex flex-col gap-1">
+                      <span className="font-semibold text-slate-800">{log.item_nome_snapshot}</span>
+                      {/* Badge de Estado do Ativo no Histórico */}
+                      <span className={`w-fit px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                        log.item_estado_snapshot === 'Novo' 
+                          ? 'bg-emerald-100 text-emerald-700' 
+                          : 'bg-amber-100 text-amber-700'
+                      }`}>
+                        {log.item_estado_snapshot}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-4 text-sm font-bold text-blue-700">
+                    {log.responsavel_ti_snapshot}
+                  </td>
+                  <td className="p-4 text-sm italic text-slate-600">
+                    {log.usuario_nome_snapshot}
+                  </td>
                 </tr>
               ))
             ) : (

@@ -86,6 +86,7 @@ def listar_equipamentos():
     conn = get_connection()
     try:
         cursor = conn.cursor(dictionary=True)
+        # O SELECT * já trará a nova coluna 'estado' automaticamente
         cursor.execute("SELECT * FROM equipamentos WHERE ativo = TRUE")
         return cursor.fetchall()
     finally:
@@ -96,9 +97,23 @@ def listar_equipamentos():
 def cadastrar_equipamento(equipamento: dict):
     conn = get_connection()
     try:
-        cursor = conn.cursor()
-        query = "INSERT INTO equipamentos (nome, categoria, quantidade) VALUES (%s, %s, %s)"
-        cursor.execute(query, (equipamento['nome'], equipamento['categoria'], equipamento['quantidade']))
+        cursor = conn.cursor(dictionary=True)
+        
+        # 1. Verifica se já existe um item com o mesmo nome e estado (case-insensitive no MySQL)
+        # O filtro 'ativo = TRUE' garante que se você excluiu um item antigo, possa cadastrá-lo de novo
+        query_check = "SELECT id FROM equipamentos WHERE LOWER(nome) = LOWER(%s) AND estado = %s AND ativo = TRUE"
+        cursor.execute(query_check, (equipamento['nome'], equipamento['estado']))
+        if cursor.fetchone():
+            raise HTTPException(status_code=400, detail="Este equipamento com este estado já está cadastrado!")
+
+        # 2. Se não existir, realiza a inserção
+        query_insert = "INSERT INTO equipamentos (nome, categoria, estado, quantidade) VALUES (%s, %s, %s, %s)"
+        cursor.execute(query_insert, (
+            equipamento['nome'], 
+            equipamento['categoria'], 
+            equipamento['estado'], 
+            equipamento['quantidade']
+        ))
         conn.commit()
         return {"status": "sucesso"}
     finally:
@@ -149,10 +164,17 @@ def adicionar_log(log: dict):
     conn = get_connection()
     try:
         cursor = conn.cursor()
+        # ADICIONADO: item_estado_snapshot na query para auditoria precisa
         query = """INSERT INTO movimentacoes 
-                   (item_nome_snapshot, usuario_nome_snapshot, responsavel_ti_snapshot, tipo_acao) 
-                   VALUES (%s, %s, %s, %s)"""
-        cursor.execute(query, (log['itemNome'], log['usuario'], log['responsavel'], log['acao']))
+                   (item_nome_snapshot, item_estado_snapshot, usuario_nome_snapshot, responsavel_ti_snapshot, tipo_acao) 
+                   VALUES (%s, %s, %s, %s, %s)"""
+        cursor.execute(query, (
+            log['itemNome'], 
+            log['estado'], # Snapshot se o item era 'Novo' ou 'Usado' no momento da ação
+            log['usuario'], 
+            log['responsavel'], 
+            log['acao']
+        ))
         conn.commit()
         return {"status": "ok"}
     finally:

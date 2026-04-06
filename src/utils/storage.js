@@ -10,16 +10,17 @@ export const getLogs = async () => {
   return await response.json();
 };
 
-// Esta função resolve o erro de "Requested module does not provide an export named 'addLog'"
-export const addLog = async (acao, itemNome, usuario, responsavel) => {
+// src/utils/storage.js
+export const addLog = async (acao, itemNome, estado, usuario, responsavel) => {
   await fetch(`${API_URL}/logs`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ 
       acao, 
       itemNome, 
+      estado, // Novo campo enviado ao Python
       usuario, 
-      responsavel // Agora enviamos o nome de quem está logado para o Python
+      responsavel 
     })
   });
 };
@@ -79,3 +80,4 @@ export const updateUser = async (id, user) => {
     body: JSON.stringify(user)
   });
 };
+
